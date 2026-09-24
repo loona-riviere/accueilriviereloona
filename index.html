@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rivière Loona</title>
+<meta name="description" content="Les petites apps de Loona.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #E7F0EE;        /* eau claire */
+    --ink: #17303A;       /* fond de rivière */
+    --muted: #5B7479;     /* galet mouillé */
+    --river: #3A8C93;     /* courant */
+    --river-soft: #A9CDCB;
+    --sun: #D9A53A;       /* reflet de soleil */
+    --stone: #FFFFFF;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0F2229; --ink: #E2EEEC; --muted: #8AA5A8;
+      --river: #5DB3B8; --river-soft: #24464C; --sun: #E6B955; --stone: #16313A;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F2229; --ink: #E2EEEC; --muted: #8AA5A8;
+    --river: #5DB3B8; --river-soft: #24464C; --sun: #E6B955; --stone: #16313A;
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 1.0625rem;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  main { max-width: 44rem; margin: 0 auto; padding: 4.5rem 1.5rem 3rem; }
+
+  header h1 {
+    margin: 0;
+    font-size: clamp(3.2rem, 13vw, 6.5rem);
+    font-weight: 800;
+    font-variation-settings: "wdth" 75;
+    line-height: 0.88;
+    letter-spacing: -0.02em;
+  }
+  header h1 span { display: block; color: var(--river); font-weight: 300; }
+  header p { margin: 1.5rem 0 0; max-width: 32rem; color: var(--muted); font-size: 1.15rem; }
+
+  /* La rivière */
+  .flow { position: relative; margin-top: 4rem; }
+  .flow svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  .flow path { fill: none; stroke: var(--river-soft); stroke-width: 10; stroke-linecap: round; }
+  .flow path.current { stroke: var(--river); stroke-width: 2; stroke-dasharray: 2 12; }
+
+  ol { list-style: none; margin: 0; padding: 0; position: relative; }
+  li + li { margin-top: 2.25rem; }
+
+  .app {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr;
+    gap: 1.25rem;
+    align-items: center;
+    color: inherit;
+    text-decoration: none;
+    border-radius: 1rem;
+    padding: 0.5rem 0.75rem 0.5rem 0;
+  }
+  .pebble {
+    width: 3.5rem; height: 3.1rem;
+    display: grid; place-items: center;
+    font-size: 1.5rem;
+    background: var(--stone);
+    border: 2px solid var(--river-soft);
+    border-radius: 48% 52% 45% 55% / 55% 48% 52% 45%;
+    position: relative; z-index: 1;
+    transition: transform .25s ease, border-color .25s ease;
+  }
+  .app:nth-child(odd) .pebble { border-radius: 55% 45% 52% 48% / 45% 55% 48% 52%; }
+  .app h2 { margin: 0; font-size: 1.35rem; font-weight: 650; line-height: 1.2; }
+  .app p { margin: 0.15rem 0 0; color: var(--muted); max-width: 30rem; }
+  .app .url { display: inline-block; margin-top: 0.35rem; font-size: 0.9rem; color: var(--river); }
+
+  .app:hover .pebble, .app:focus-visible .pebble { transform: rotate(-8deg) scale(1.06); border-color: var(--sun); }
+  .app:hover h2 { text-decoration: underline; text-decoration-color: var(--sun); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+  .app:focus-visible { outline: 3px solid var(--sun); outline-offset: 4px; }
+
+  footer {
+    margin-top: 4.5rem;
+    padding-top: 1.5rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+    display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; justify-content: space-between;
+  }
+  footer a { color: inherit; }
+  footer a:hover { color: var(--river); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .flow path.bed { stroke-dasharray: var(--len); stroke-dashoffset: var(--len); animation: draw 1.6s cubic-bezier(.6,.1,.3,1) .2s forwards; }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Rivière<span>Loona</span></h1>
+    <p>Les petites apps que je code pour moi, et parfois pour nous deux. Chacune demande une connexion.</p>
+  </header>
+
+  <div class="flow" id="flow">
+    <svg aria-hidden="true"><path class="bed"></path><path class="current"></path></svg>
+    <ol id="apps"></ol>
+  </div>
+
+  <footer>
+    <span>Fait main par Loona</span>
+    <a href="https://github.com/loona-riviere">GitHub</a>
+  </footer>
+</main>
+
+<script>
+  // ✏️ Pour ajouter une app : une ligne de plus ici, c'est tout.
+  const APPS = [
+    { emoji: "📺", name: "Zapping", sub: "zapping", desc: "Mes séries et mes films : ce que j'ai vu, et quoi regarder ensuite." },
+    { emoji: "🪴", name: "Mes plantes", sub: "mes-plantes", desc: "Qui a soif, qui a besoin de soleil." },
+    { emoji: "🍷", name: "My cellar", sub: "my-cellar", desc: "La cave : bouteilles, notes et dégustations." },
+    { emoji: "🏡", name: "Matrimoine", sub: "matrimoine", desc: "Notre matrimoine, en un coup d'œil." },
+    { emoji: "💍", name: "Notre mariage", sub: "mariage-loona-julien", desc: "Loona & Julien, 25 juillet 2026." },
+    { emoji: "🎨", name: "Mes couleurs", sub: "mescouleurs", desc: "Mon nuancier personnel." },
+  ];
+
+  const list = document.getElementById("apps");
+  list.innerHTML = APPS.map(a => `
+    <li>
+      <a class="app" href="https://${a.sub}.riviereloona.fr">
+        <span class="pebble" aria-hidden="true">${a.emoji}</span>
+        <span>
+          <h2>${a.name}</h2>
+          <p>${a.desc}</p>
+          <span class="url">${a.sub}.riviereloona.fr</span>
+        </span>
+      </a>
+    </li>`).join("");
+
+  // Trace une rivière qui serpente d'un galet à l'autre
+  const flow = document.getElementById("flow");
+  const paths = flow.querySelectorAll("path");
+
+  function drawRiver() {
+    const box = flow.getBoundingClientRect();
+    const pts = [...flow.querySelectorAll(".pebble")].map(p => {
+      const r = p.getBoundingClientRect();
+      return { x: r.left - box.left + r.width / 2, y: r.top - box.top + r.height / 2 };
+    });
+    if (!pts.length) return;
+    const swing = Math.min(70, box.width * 0.12);
+    let d = `M ${pts[0].x} ${pts[0].y - 60}`;
+    d += ` C ${pts[0].x + swing * 0.6} ${pts[0].y - 40}, ${pts[0].x - swing * 0.3} ${pts[0].y - 20}, ${pts[0].x} ${pts[0].y}`;
+    for (let i = 1; i < pts.length; i++) {
+      const a = pts[i - 1], b = pts[i], dir = i % 2 ? 1 : -1, mid = (b.y - a.y) / 2;
+      d += ` C ${a.x + swing * dir} ${a.y + mid * 0.6}, ${b.x + swing * dir} ${b.y - mid * 0.6}, ${b.x} ${b.y}`;
+    }
+    const last = pts[pts.length - 1];
+    d += ` C ${last.x - swing * 0.6} ${last.y + 25}, ${last.x + swing * 0.4} ${last.y + 45}, ${last.x} ${last.y + 70}`;
+    paths.forEach(p => p.setAttribute("d", d));
+    paths[0].style.setProperty("--len", Math.ceil(paths[0].getTotalLength()));
+  }
+
+  drawRiver();
+  document.fonts?.ready.then(drawRiver);
+  addEventListener("resize", drawRiver);
+</script>
+</body>
+</html>
